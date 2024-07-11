@@ -36,13 +36,16 @@ erDiagram
 
 ## DB
 
+- development env
+
+```bash
 I try to develop using postgres run on docker container.
 
 ```bash
 docker run --name online_course_development -d -p 5432:5432 -v ./postgres_data:/var/lib/postgresql/data -e POSTGRES_DB=online_course_development -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
 ```
 
-# test env
+- test env
 ```
 docker run --name online_course_test -d -p 5433:5432 -e POSTGRES_DB=online_course_test -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
 DISABLE_SPRING=true rails db:migrate RAILS_ENV=test
@@ -50,19 +53,18 @@ DISABLE_SPRING=true rails db:migrate RAILS_ENV=test
 
 ## Gems
 
-# annotated: for model documentation
+- annotated: for model documentation
 
 ```bash
 annotate --models
 ```
 
-# pry & pry-byebug: for debug and navigation
-
-# activerecord-import: avoid N+1 query when doing association insert
+- pry & pry-byebug: for debug and navigation
+- activerecord-import: avoid N+1 query when doing association insert
 
 ## Issues
 
-# apple silicon issue
+- apple silicon issue
 
 I get this error when I try to run `rails c`
 
@@ -83,6 +85,4 @@ or just
 spring stop
 ```
 
-# delete dependent: :destroy N+1 query
-
-use destroy_all and foreign_key on_delete cascade
+- delete dependent: :destroy N+1 query: use destroy_all and foreign_key on_delete cascade
