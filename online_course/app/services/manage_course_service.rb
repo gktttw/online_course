@@ -30,8 +30,8 @@ class ManageCourseService
         end
       end
 
-      Chapter.import chapter_records
-      Unit.import unit_records
+      Chapter.import! chapter_records
+      Unit.import! unit_records
 
       course.to_json_with_associations
     rescue ActiveRecord::RecordInvalid => e
@@ -114,8 +114,10 @@ class ManageCourseService
       Chapter.where(id: chapters_to_delete.flatten.map(&:id)).destroy_all if chapters_to_delete.flatten.any?
       Unit.where(id: units_to_delete.flatten.map(&:id)).destroy_all if units_to_delete.flatten.any?
 
-      Chapter.import chapter_records, on_duplicate_key_update: { conflict_target: [:id], columns: [:name, :ordering, :updated_at] }
-      Unit.import unit_records, on_duplicate_key_update: { conflict_target: [:id], columns: [:name, :content, :ordering, :description, :updated_at] }
+      Chapter.import! chapter_records, on_duplicate_key_update: { conflict_target: [:id], columns: [:name, :ordering, :updated_at] }
+      Chapter.import! chapter_records.filter{ !_1.persisted? }
+      Unit.import! unit_records, on_duplicate_key_update: { conflict_target: [:id], columns: [:name, :content, :ordering, :description, :updated_at] }
+      Unit.import! unit_records.filter{ !_1.persisted? }
 
       course.to_json_with_associations
     rescue ActiveRecord::RecordInvalid => e

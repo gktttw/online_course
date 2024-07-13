@@ -71,7 +71,6 @@ module Api
       end
 
       def update
-        Rails.logger.info("params #{update_courses_params.to_h.merge(id: params[:id])}")
         res = ManageCourseService.new(payload: update_courses_params.to_h.merge(id: params[:id])).update
         render json: res, status: :ok
       rescue ManageCourseService::Error => e
