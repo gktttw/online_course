@@ -14,6 +14,130 @@ rails db:migrate
 rails s
 ```
 
+## usage
+
+- get all courses
+  ```bash
+  curl --location 'localhost:3000/api/v1/courses'
+  ```
+
+  - show course by id
+    ```
+    curl --location 'localhost:3000/api/v1/courses/48'
+    ```
+
+    - create course
+      - create just a course
+        ```
+        curl --location 'localhost:3000/api/v1/courses' \
+        --header 'Content-Type: application/json' \
+        --data '{
+          "course": {
+            "name": "my_new_course",
+            "lecturer_name": "my_lecturer_name"
+          }
+        }'
+        ```
+      - create course with chapters
+        - put chapters_attributes in order, ordering will be automatically assigned
+        ```
+        curl --location 'localhost:3000/api/v1/courses' \
+        --header 'Content-Type: application/json' \
+        --data '{
+          "course": {
+            "name": "my_new_course",
+            "lecturer_name": "my_lecturer_name",
+            "chapters_attributes": [
+              {
+                "name": "Chapter 1"
+              },
+              {
+                "name": "Chapter 2"
+              }
+            ]
+          }
+        }'
+        ```
+      - create course with chapters and units
+        - like chapters_attributes, units_attributes should be in order
+        
+        ```
+        curl --location 'localhost:3000/api/v1/courses' \
+        --header 'Content-Type: application/json' \
+        --data '{
+          "course": {
+            "name": "my_new_course",
+            "lecturer_name": "my_lecturer_name",
+            "chapters_attributes": [
+              {
+                "name": "Chapter 1",
+                "units_attributes": [
+                  {
+                    "name": "unit 1-1",
+                    "content": "unit 1-1 content"
+                  },
+                  {
+                    "name": "unit 1-2",
+                    "content": "unit 1-2 content"
+                  }
+                ]
+              },
+              {
+                "name": "Chapter 2",
+                "units_attributes": [
+                  {
+                    "name": "unit 2-1",
+                    "content": "unit 2-1 content"
+                  },
+                  {
+                    "name": "unit 2-2",
+                    "content": "unit 2-2 content"
+                  },
+                  {
+                    "name": "unit 2-3",
+                    "content": "unit 2-3 content"
+                  }
+                ]
+              }
+            ]
+          }
+        }'
+        ```
+        - update course
+          - it follows PATCH semantics, so you can update only the fields you want
+          - if it's the relation field, you can update it by using _attributes
+          - if you want to delete the relation, put it as a empty array
+          - if you want to update the relation, put the new data in the array with the same id
+          - if you want to add new relation, put the new data in the array without id
+          ```
+            curl --location --request PATCH 'localhost:3000/api/v1/courses/52' \
+            --header 'Content-Type: application/json' \
+            --data '{
+              "course": {
+                "chapters_attributes": [
+                  {
+                    "id": 57,
+                    "units_attributes": [
+                      {
+                        "id": 119,
+                        "content": "unit 1-1 updated"
+                      },
+                      {
+                        "name": "unit 1-3",
+                        "content": "new unit 1-3 content"
+                      }
+                    
+                    ]
+                  },
+                  {
+                    "id": 58 
+                  }
+                ]
+              }
+            }'
+          ```
+  
+
 ## ERD
 
 ```mermaid
