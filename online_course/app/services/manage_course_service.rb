@@ -1,6 +1,18 @@
 class ManageCourseService
-  def initialize(params)
-    @params = params
+  def initialize(payload: {})
+    @params = payload
+  end
+
+  def get_all
+    courses = Course.includes(chapters: :units).all
+    courses.to_json(include: { chapters: { include: :units } })
+  end
+
+  def show_one
+    course = Course.find_by!(id: @params[:id])
+    course.to_json_with_associations
+  rescue ActiveRecord::RecordNotFound
+    raise Error.new("cannot find curse id: #{@params[:id]}", :not_found)
   end
 
   def create
@@ -9,11 +21,11 @@ class ManageCourseService
       chapter_records = []
       unit_records = []
 
-      @params[:chapters_attributes].each_with_index do |chapter_attr, chapter_ordering|
+      @params[:chapters_attributes]&.each_with_index do |chapter_attr, chapter_ordering|
         chapter = course.chapters.new(chapter_attr.except(:units_attributes).merge(ordering: chapter_ordering))
         chapter_records << chapter
 
-        chapter_attr[:units_attributes].each_with_index do |unit_attr, unit_ordering|
+        chapter_attr[:units_attributes]&.each_with_index do |unit_attr, unit_ordering|
           unit_records << chapter.units.new(unit_attr.merge(ordering: unit_ordering))
         end
       end
@@ -23,12 +35,10 @@ class ManageCourseService
 
       course.to_json_with_associations
     rescue ActiveRecord::RecordInvalid => e
-      binding.pry
       Rails.logger.error(e.message)
       Rails.logger.error(e.backtrace.take(20).join("\n"))
       raise Error.new(e.message)
     rescue => e
-      binding.pry
       Rails.logger.error(e.message)
       Rails.logger.error(e.backtrace.take(20).join("\n"))
       raise Error.new(e.message, :internal_server_error)
@@ -53,10 +63,10 @@ class ManageCourseService
   def update
     ActiveRecord::Base.transaction do
       course = Course.includes(chapters: :units).find(@params[:id])
-      course.update!(@params.except(:chapters_attributes))
+      course.update!(@params.except(:chapters_attributes, :id))
 
       if @params[:chapters_attributes].nil?
-        course.to_json_with_associations
+        return course.to_json_with_associations
       end
 
       chapter_ids = @params[:chapters_attributes].map { |chap| chap[:id] }
@@ -76,7 +86,7 @@ class ManageCourseService
 
       @params[:chapters_attributes].each do |chapter_attr|
         chapter = existing_chapters[chapter_attr[:id]] || course.chapters.new
-        chapter.assign_attributes(chapter_attr.except(:units_attributes))
+        chapter.assign_attributes(chapter_attr.except(:units_attributes, :id))
         chapter_records << chapter
 
         if chapter.persisted?

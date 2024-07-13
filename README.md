@@ -4,6 +4,15 @@ This project's root dir and rails service root dir are not the same. You should 
 start rails server.
 
 ## how to start
+```bash
+# db
+docker run --name online_course_development -d -p 5432:5432 -v ./postgres_data:/var/lib/postgresql/data -e POSTGRES_DB=online_course_development -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
+# rails
+cd online_course
+bundle install
+rails db:migrate
+rails s
+```
 
 ## ERD
 
@@ -37,30 +46,27 @@ erDiagram
 ## DB
 
 - development env
-
-```bash
-I try to develop using postgres run on docker container.
-
-```bash
-docker run --name online_course_development -d -p 5432:5432 -v ./postgres_data:/var/lib/postgresql/data -e POSTGRES_DB=online_course_development -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
-```
+    ```bash
+    I try to develop using postgres run on docker container.
+    
+    ```bash
+    docker run --name online_course_development -d -p 5432:5432 -v ./postgres_data:/var/lib/postgresql/data -e POSTGRES_DB=online_course_development -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
+    ```
 
 - test env
-```
-docker run --name online_course_test -d -p 5433:5432 -e POSTGRES_DB=online_course_test -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
-DISABLE_SPRING=true rails db:migrate RAILS_ENV=test
-```
+    ```
+    docker run --name online_course_test -d -p 5433:5432 -e POSTGRES_DB=online_course_test -e POSTGRES_USER=online_course_user -e POSTGRES_PASSWORD=online_course_password postgres
+    DISABLE_SPRING=true rails db:migrate RAILS_ENV=test
+    ```
 
 ## Gems
 
-- annotated: for model documentation
-
-```bash
-annotate --models
-```
-
+- annotated: for model documentation, do `annotate --models`
 - pry & pry-byebug: for debug and navigation
 - activerecord-import: avoid N+1 query when doing association insert
+- faker: generate fake data
+- factory_bot_rails: generate fake data for test
+- simplecov: code coverage, when run rspec, it will generate coverage report in public/coverage dir
 
 ## Issues
 

@@ -11,6 +11,8 @@
 #
 class Chapter < ActiveRecord::Base
   validates :name, presence: true
+  validates :ordering, presence: true
+  validates :ordering, numericality: true
 
   belongs_to :course
   has_many :units, dependent: :delete_all
